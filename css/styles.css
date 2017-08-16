@@ -1,0 +1,40 @@
+body {
+	font-family: 'Quicksand', sans-serif;
+	width: 700px;
+	border-style: none;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: #282C34;
+	color: #aeaeae;
+	font-size: 14px;
+}
+
+h1 {
+	text-align: center;
+	font-size: 18px;
+	font-weight: lighter;
+}
+
+textarea {
+	width: 700px;
+	height: 200px;
+	padding: 4px 7px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: #fff;
+	color: #333;
+	margin-bottom: 7px;
+	background-color: #dbdfe6;
+    outline: none;
+}
+
+#buttons {
+	width: 600px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#parse, #clear {
+	width: 50px;
+}
