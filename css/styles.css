@@ -38,3 +38,14 @@ textarea {
 #parse, #clear {
 	width: 50px;
 }
+
+.options {
+	width: 600px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#cleanDescText {
+	font-size: 12px;
+}
