@@ -10,10 +10,12 @@ const clearBtn = document.getElementById('clear');
 const input = document.getElementById('input');
 const inputCount = document.getElementById('inputCount');
 const output = document.getElementById('output');
+const outputTextArea = document.getElementById('outputTextArea');
 const outputCount = document.getElementById('outputCount');
 const dropDown = document.getElementById('dropDown');
 const cleanVariables = document.getElementById('cleanVariables');
 const cleanParams = document.getElementById('cleanParams');
+const copyBtn = document.getElementById('copy');
 
 input.focus();
 
@@ -43,10 +45,10 @@ parseBtn.addEventListener('click', () => {
 			break;
 	}
 
-	output.value = parsedData;
+	parser.clipboard = parsedData;
+	outputTextArea.value = parsedData;
+	output.innerHTML = Prism.highlight(parsedData, Prism.languages.javascript);
 	parser.getLineCounts();
-	output.focus();
-	output.select();
 });
 
 /*
@@ -66,11 +68,22 @@ clearBtn.addEventListener('click', () => {
 	parser.getLineCounts();
 });
 
+/*
+ * @public
+ * Copy to clipboard button click event
+ */
+copyBtn.addEventListener('click', () => {
+	outputTextArea.select();
+	document.execCommand("Copy");
+});
+
 class Parser {
 	/*
 	 * Constructor
 	 */
-	constructor() {}
+	constructor() {
+		this.clipboard = '';
+	}
 
 	/*
 	 * Remove unnecessary charID and stringID variables for a shorter code
@@ -161,7 +174,7 @@ class Parser {
 				}
 				lists[listNumber].push(lineValue);
 				// Replace found value with param value
-				parsedLine = line.replace(/ \d+ /, ` params.${listNumber}[${lists[listNumber].length - 1}]`);
+				parsedLine = line.replace(/ \d+ /, ` params.${listNumber}[${lists[listNumber].length - 1}] `);
 				parsedLines.push(parsedLine);
 			} else if(line.match(/putBoolean|putUnitDouble|putDouble|putInteger|putIdentifier|putIndex|putString|putName|putPath/)) {
 				lineSplit = line.split(', ');
@@ -208,7 +221,7 @@ ${functionName}(params);`;
 		if(constants.hasOwnProperty(variable)) {
 			return constants[variable];
 		} else {
-			return variable.toLowerCase();
+			return variable.charAt(0).toLowerCase() + variable.slice(1);
 		}
 	}
 
@@ -289,7 +302,7 @@ ${functionName}(params);`;
 		if(inputData !== '') {
 			inputLines = inputData.split('\n');
 		}
-		let outputData = output.value;
+		let outputData = output.innerHTML;
 		let outputLines = [];
 		if(outputData !== '') {
 			outputLines = outputData.split('\n');
