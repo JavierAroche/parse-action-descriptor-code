@@ -1,201 +1,270 @@
-var parseBtn = document.getElementById('parse');
-var clearBtn = document.getElementById('clear');
-var input = document.getElementById('input');
-var output = document.getElementById('output');
-var dropDown = document.getElementById('dropDown');
-var cleanDescCheck = document.getElementById('cleanDescCheck');
+/*
+ *
+ * Parse Action Descriptor Code
+ * Author: Javier Aroche (https://github.com/JavierAroche)
+ *
+ */
+
+const parseBtn = document.getElementById('parse');
+const clearBtn = document.getElementById('clear');
+const input = document.getElementById('input');
+const inputCount = document.getElementById('inputCount');
+const output = document.getElementById('output');
+const outputCount = document.getElementById('outputCount');
+const dropDown = document.getElementById('dropDown');
+const cleanDescCheck = document.getElementById('cleanDescCheck');
 
 input.focus();
 
-parseBtn.addEventListener('click', function() {
-	var data = input.value;
-	var parsedData = data;
+/*
+ * @public
+ * Parse button click event
+ */
+parseBtn.addEventListener('click', () => {
+	let data = input.value;
+	let parsedData = data;
 
 	if(cleanDescCheck.checked) {
-		parsedData = cleanDesc(parsedData);
+		parsedData = parser.cleanDesc(parsedData);
 	}
 
 	switch(dropDown.value) {
 		case 'cleanJSX':
-			parsedData = cleanJSX(parsedData);
+			parsedData = parser.cleanJSX(parsedData);
 			break;
 		case 'sortIDs':
-			parsedData = sortIDs(parsedData);
+			parsedData = parser.sortIDs(parsedData);
 			break;
 		case 'createFunction':
-			parsedData = cleanJSX(parsedData);
-			parsedData = createFunction(parsedData);
+			parsedData = parser.cleanJSX(parsedData);
+			parsedData = parser.createFunction(parsedData);
 			break;
 	}
 
 	output.value = parsedData;
+	parser.getLineCounts();
 	output.focus();
 	output.select();
 });
 
-clearBtn.addEventListener('click', function() {
+/*
+ * @public
+ * Get line count on change
+ */
+input.addEventListener('input', () => {
+	parser.getLineCounts();
+})
+
+/*
+ * @public
+ * Clear button click event
+ */
+clearBtn.addEventListener('click', () => {
 	input.value = '';
+	parser.getLineCounts();
 });
 
-function cleanJSX(data) {
-	var lines = data.split('\n');
-	var variables = {};
-	var actionLines = [];
-	// Identify lines with charIDs or stringIDs
-	lines.forEach(function(line) {
-		if (line.match('var') && (line.match('charIDToTypeID') || line.match('stringIDToTypeID'))) {
-			var variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
-			var id = line.replace(/[\s+]*.+= /, '').replace(';', '');
-			variables[variableName] = id;
-		} else {
-			var cleanLine;
-			if(line[0] === ' ' || line[0] === '    ') {
-				cleanLine = line.replace(/\s+/, '');
+class Parser {
+	/*
+	 * Constructor
+	 */
+	constructor() {}
+
+	/*
+	 * Remove unnecessary charID and stringID variables for a shorter code
+	 */
+	cleanJSX(data) {
+		let lines = data.split('\n');
+		let variables = {};
+		let actionLines = [];
+		// Identify lines with charIDs or stringIDs
+		lines.forEach(line => {
+			if(line.match('var') && (line.match('charIDToTypeID') || line.match('stringIDToTypeID'))) {
+				let variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
+				let id = line.replace(/[\s+]*.+= /, '').replace(';', '');
+				variables[variableName] = id;
 			} else {
-				cleanLine = line;
+				let cleanLine;
+				if(line[0] === ' ' || line[0] === '    ') {
+					cleanLine = line.replace(/\s+/, '');
+				} else {
+					cleanLine = line;
+				}
+				actionLines.push(cleanLine);
 			}
-			actionLines.push(cleanLine);
-		}
-	});
+		});
 
-	// Cleanup lines
-	var parsedLines = [];
-	actionLines.forEach(function(actionLine) {
-		var idNames = actionLine.match(/id\w+/g);
-		var parsedLine = actionLine;
-		if (idNames && idNames.length > 0) {
-			idNames.forEach(function(idName) {
-				parsedLine = parsedLine.replace(idName, variables[idName]);
-			});
-		}
-		parsedLines.push(parsedLine);
-	});
+		// Cleanup lines
+		let parsedLines = [];
+		actionLines.forEach(actionLine => {
+			let idNames = actionLine.match(/id\w+/g);
+			let parsedLine = actionLine;
+			if(idNames && idNames.length > 0) {
+				idNames.forEach(function(idName) {
+					parsedLine = parsedLine.replace(idName, variables[idName]);
+				});
+			}
+			parsedLines.push(parsedLine);
+		});
 
-	return parsedLines.join('\n');
+		return parsedLines.join('\n');
+	}
+
+	/*
+	 * Sort IDs by placing them at the top for easier readibility
+	 */
+	sortIDs(data) {
+		let lines = data.split('\n');
+		let variables = {};
+		let actionLines = [];
+		lines.forEach(line => {
+			if(line.match('var') && (line.match('charIDToTypeID') || line.match('stringIDToTypeID'))) {
+				let variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
+				let id = line.replace(/[\s+]*.+= /, '').replace(';', '');
+				variables[variableName] = id;
+			} else {
+				let cleanLine = line;
+				if(cleanLine[0] === ' ') {
+					cleanLine = cleanLine.replace(/\s+/, '');
+				}
+				actionLines.push(cleanLine);
+			}
+		});
+
+		let varIDs = '';
+		for(let i in variables) {
+			varIDs = varIDs + 'var ' + i + ' = ' + variables[i] + ';' + '\n';
+		};
+
+		return varIDs + '\n' + actionLines.join('\n');
+	}
+
+	/*
+	 * Create a function based on the action descriptor code
+	 */
+	createFunction(data) {
+		let lines = data.split('\n');
+		let variables = {};
+		let actionLines = [];
+		lines.forEach(line => {
+			if(line.match(/desc\w+.put/)) {
+				let variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
+				let id = line.replace(/[\s+]*.+= /, '').replace(';', '');
+				variables[variableName] = id;
+			} else {
+				let cleanLine = line;
+				if(cleanLine[0] === ' ') {
+					cleanLine = cleanLine.replace(/\s+/, '');
+				}
+				actionLines.push(cleanLine);
+			}
+		});
+		console.log(lines);
+
+		//\( charIDToTypeID\(( ".+" \), .+ \))
+
+		let parsedLines = [];
+		// actionLines.forEach(actionLine => {
+		// 	let idNames = actionLine.match(/id\w+/g);
+		// 	let parsedLine = actionLine;
+		// 	if(idNames && idNames.length > 0) {
+		// 		idNames.forEach(function(idName) {
+		// 			parsedLine = parsedLine.replace(idName, variables[idName]);
+		// 		});
+		// 	}
+		// 	parsedLines.push(parsedLine);
+		// });
+
+		return parsedLines.join('\n');
+
+		return data
+	}
+
+	/*
+	 * Clean descriptor variables to start count from 1
+	 */
+	cleanDesc(data) {
+		let lines = data.split('\n');
+		let variables = {};
+		let actionLines = [];
+		let descCount = 1;
+		let refCount = 1;
+		let listCount = 1;
+		// Identify lines with variables
+		lines.forEach(line => {
+			if(line.match('var') && (line.match('ActionDescriptor') || line.match('ActionReference') || line.match('ActionList'))) {
+				actionLines.push(line);
+				let variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
+				let newVariableName;
+				if(line.match('ActionDescriptor')) {
+					newVariableName = 'desc' + descCount;
+					descCount = descCount + 1;
+				} else if(line.match('ActionReference')) {
+					newVariableName = 'ref' + refCount;
+					refCount = refCount + 1;
+				} else if(line.match('ActionList')) {
+					newVariableName = 'list' + listCount;
+					listCount = listCount + 1;
+				}
+				variables[variableName] = newVariableName;
+			} else {
+				let cleanLine = line;
+				if(cleanLine[0] === ' ') {
+					cleanLine = cleanLine.replace(/\s+/, '');
+				}
+				actionLines.push(cleanLine);
+			}
+		});
+
+		// Cleanup variable names
+		let parsedLines = [];
+		actionLines.forEach(actionLine => {
+			let parsedLine = actionLine;
+
+			let descVars = actionLine.match(/desc\w+/g);
+			if(descVars && descVars.length > 0) {
+				descVars.forEach(function(descVar) {
+					parsedLine = parsedLine.replace(descVar, variables[descVar]);
+				});
+			}
+
+			let refVars = actionLine.match(/ref\w+/g);
+			if(refVars && refVars.length > 0) {
+				refVars.forEach(function(refVar) {
+					parsedLine = parsedLine.replace(refVar, variables[refVar]);
+				});
+			}
+
+			let listVars = actionLine.match(/list\w+/g);
+			if(listVars && listVars.length > 0) {
+				listVars.forEach(function(listVar) {
+					parsedLine = parsedLine.replace(listVar, variables[listVar]);
+				});
+			}
+
+			parsedLines.push(parsedLine);
+		});
+
+		return parsedLines.join('\n');
+	}
+
+	/*
+	 * Get line counts
+	 */
+	getLineCounts() {
+		let inputData = input.value;
+		let inputLines = [];
+		if(inputData !== '') {
+			inputLines = inputData.split('\n');
+		}
+		let outputData = output.value;
+		let outputLines = [];
+		if(outputData !== '') {
+			outputLines = outputData.split('\n');
+		}
+		inputCount.innerHTML = inputLines.length;
+		outputCount.innerHTML = outputLines.length;
+	}
 }
 
-function sortIDs(data) {
-	var lines = data.split('\n');
-	var variables = {};
-	var actionLines = [];
-	lines.forEach(function(line) {
-		if (line.match('var') && (line.match('charIDToTypeID') || line.match('stringIDToTypeID'))) {
-			var variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
-			var id = line.replace(/[\s+]*.+= /, '').replace(';', '');
-			variables[variableName] = id;
-		} else {
-			var cleanLine = line;
-			if(cleanLine[0] === ' ') {
-				cleanLine = cleanLine.replace(/\s+/, '');
-			}
-			actionLines.push(cleanLine);
-		}
-	});
-
-	var varIDs = '';
-	for(var i in variables) {
-		varIDs = varIDs + 'var ' + i + ' = ' + variables[i] + ';' + '\n';
-	};
-
-	return varIDs + '\n' + actionLines.join('\n');
-}
-
-function createFunction(data) {
-	var lines = data.split('\n');
-	var variables = {};
-	var actionLines = [];
-	lines.forEach(function(line) {
-		if (line.match(/desc\w+.put/)) {
-			var variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
-			var id = line.replace(/[\s+]*.+= /, '').replace(';', '');
-			variables[variableName] = id;
-		} else {
-			var cleanLine = line;
-			if(cleanLine[0] === ' ') {
-				cleanLine = cleanLine.replace(/\s+/, '');
-			}
-			actionLines.push(cleanLine);
-		}
-	});
-
-	var parsedLines = [];
-	actionLines.forEach(function(actionLine) {
-		var idNames = actionLine.match(/id\w+/g);
-		var parsedLine = actionLine;
-		if (idNames && idNames.length > 0) {
-			idNames.forEach(function(idName) {
-				parsedLine = parsedLine.replace(idName, variables[idName]);
-			});
-		}
-		parsedLines.push(parsedLine);
-	});
-
-	return parsedLines.join('\n');
-
-	return data
-}
-
-function cleanDesc(data) {
-	var lines = data.split('\n');
-	var variables = {};
-	var actionLines = [];
-	var descCount = 1;
-	var refCount = 1;
-	var listCount = 1;
-	// Identify lines with variables
-	lines.forEach(function(line) {
-		if (line.match('var') && (line.match('ActionDescriptor') || line.match('ActionReference') || line.match('ActionList'))) {
-			actionLines.push(line);
-			var variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
-			var newVariableName;
-			if(line.match('ActionDescriptor')) {
-				newVariableName = 'desc' + descCount;
-				descCount = descCount + 1;
-			} else if(line.match('ActionReference')) {
-				newVariableName = 'ref' + refCount;
-				refCount = refCount + 1;
-			} else if(line.match('ActionList')) {
-				newVariableName = 'list' + listCount;
-				listCount = listCount + 1;
-			}
-			variables[variableName] = newVariableName;
-		} else {
-			var cleanLine = line;
-			if(cleanLine[0] === ' ') {
-				cleanLine = cleanLine.replace(/\s+/, '');
-			}
-			actionLines.push(cleanLine);
-		}
-	});
-
-	// Cleanup variable names
-	var parsedLines = [];
-	actionLines.forEach(function(actionLine) {
-		var parsedLine = actionLine;
-
-		var descVars = actionLine.match(/desc\w+/g);
-		if (descVars && descVars.length > 0) {
-			descVars.forEach(function(descVar) {
-				parsedLine = parsedLine.replace(descVar, variables[descVar]);
-			});
-		}
-
-		var refVars = actionLine.match(/ref\w+/g);
-		if (refVars && refVars.length > 0) {
-			refVars.forEach(function(refVar) {
-				parsedLine = parsedLine.replace(refVar, variables[refVar]);
-			});
-		}
-
-		var listVars = actionLine.match(/list\w+/g);
-		if (listVars && listVars.length > 0) {
-			listVars.forEach(function(listVar) {
-				parsedLine = parsedLine.replace(listVar, variables[listVar]);
-			});
-		}
-
-		parsedLines.push(parsedLine);
-	});
-
-	return parsedLines.join('\n');
-}
+let parser = new Parser();
