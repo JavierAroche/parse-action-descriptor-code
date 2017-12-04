@@ -25,7 +25,7 @@ parseBtn.addEventListener('click', () => {
 	let parsedData = data;
 
 	if(cleanVariables.checked) {
-		parsedData = parser.cleanDesc(parsedData);
+		parsedData = parser.cleanVariables(parsedData);
 	}
 
 	switch(dropDown.value) {
@@ -84,7 +84,7 @@ class Parser {
 				let variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
 				let id = line.replace(/[\s+]*.+= /, '').replace(';', '');
 				variables[variableName] = id;
-			} else {
+			} else if(line !== '') {
 				let cleanLine;
 				if(line[0] === ' ' || line[0] === '    ') {
 					cleanLine = line.replace(/\s+/, '');
@@ -146,12 +146,25 @@ class Parser {
 	createFunction(data, functionName) {
 		let lines = data.split('\n');
 		let variables = [];
+		let lists = {};
 		let parsedLines = [];
-		let lineSplit, lineValue, lineProperty, parsedLine;
+		let lineSplit, lineValue, lineProperty, parsedLine, listNumber;
 		lines.forEach(line => {
-			if(line.match(/putBoolean|putUnitDouble|putDouble|putInteger|putString|putName|putPath/)) {
+			if(line.match(/list|ref/) && line.match(/putIndex|putInteger|putIdentifier/)) {
+				// Get list/ref number and capitalize first letter
+				listNumber = line.match(/\w+/)[0];
+				// Get value
+				lineValue = Number(line.match(/ \d+ /)[0]);
+				if(!lists.hasOwnProperty(listNumber)) {
+					lists[listNumber] = [];
+				}
+				lists[listNumber].push(lineValue);
+				// Replace found value with param value
+				parsedLine = line.replace(/ \d+ /, `params.${listNumber}[${lists[listNumber].length - 1}]`);
+				parsedLines.push(parsedLine);
+			} else if(line.match(/putBoolean|putUnitDouble|putDouble|putInteger|putIdentifier|putIndex|putString|putName|putPath/)) {
 				lineSplit = line.split(', ');
-				// Find value and property name
+				// Get value and property name
 				lineValue = lineSplit[lineSplit.length - 1].replace(/ \);/, '');
 				lineProperty = lineSplit[0].replace(/.+(stringIDToTypeID|charIDToTypeID)/, '').match(/\w+/)[0];
 				// Add to array which will become the params object
@@ -163,6 +176,11 @@ class Parser {
 				parsedLines.push(line);
 			}
 		});
+
+		// Add lists as variables
+		for(let key in lists) {
+			variables.push(`${key}: [${lists[key].join(',')}]`);
+		}
 
 		// Create function string
 		let functionString =
@@ -180,9 +198,9 @@ ${functionName}(params);`;
 	}
 
 	/*
-	 * Clean descriptor variables to start count from 1
+	 * Clean variables to start count from 1
 	 */
-	cleanDesc(data) {
+	cleanVariables(data) {
 		let lines = data.split('\n');
 		let variables = {};
 		let actionLines = [];
