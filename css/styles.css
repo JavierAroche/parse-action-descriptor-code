@@ -54,7 +54,6 @@ textarea {
 
 #dropDown {
 	margin: 0 5px 0 5px;
-	background-color: lightgrey;
 	outline: none;
 }
 
@@ -69,6 +68,5 @@ textarea {
 	border-radius: 2px;
 	outline: none;
 	text-align: center;
-	background-color: lightgrey;
 	margin: 0 5px 0 5px;
 }
