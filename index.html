@@ -3,21 +3,43 @@
 <head>
 	<title>parse-action-descriptor-code</title>
 	<link rel="stylesheet" type="text/css" href="./css/styles.css" />
+	<link href="./css/prism-themes/prism-onedark.css" rel="stylesheet" />
+	<!-- <link href="./node_modules/prismjs/themes/prism-okaidia.css" rel="stylesheet" /> -->
+	<script src="./node_modules/prismjs/prism.js"></script>
 </head>
 
 <body>
 	<h1>Input</h1>
+	<h3>
+		<span>Line count: </span>
+		<span id="inputCount">0</span>
+	</h3>
 	<textarea id="input"></textarea>
-	<br/>
-	<div id=buttons>
-		<button id="parse">parse</button>
-		<button id="clear">clear</button>
+
+	<div class="options">
+		<select id="dropDown">
+			<option value="cleanJSX">Clean JSX</option>
+			<option value="sortIDs">Sort IDs</option>
+			<option value="createFunction">Create Function</option>
+			<input id="functionName" type="text" value="functionName">
+		</select>
+		<input id="cleanVariables" type="checkbox" checked><span id="cleanVariablesText"> Clean variables</span>
+		<input id="cleanParams" type="checkbox" checked><span id="cleanParamsText"> Clean params</span>
+		<button id="parse">Parse</button>
+		<button id="clear">Clear</button>
 	</div>
-	<br><br>
+
 	<h1>Output</h1>
-	<textarea id="output"></textarea>
+	<h3>
+		<span>Line count: </span>
+		<span id="outputCount">0</span>
+	</h3>
+	<pre id="outputPre"><code id="output" class="language-js"></code></pre>
+	<div class="options">
+		<button id="copy">Copy to clipboard</button>
+	</div>
+	<textarea id="outputTextArea"></textarea>
 </body>
-
+<script type="text/javascript" src="./constants.js"></script>
 <script type="text/javascript" src="./main.js"></script>
-
 </html>
