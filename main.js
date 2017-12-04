@@ -144,40 +144,38 @@ class Parser {
 	 */
 	createFunction(data) {
 		let lines = data.split('\n');
-		let variables = {};
-		let actionLines = [];
+		let variables = [];
+		let parsedLines = [];
+		let lineSplit, lineValue, lineProperty, parsedLine;
 		lines.forEach(line => {
-			if(line.match(/desc\w+.put/)) {
-				let variableName = line.replace(/[\s+]*var /, '').replace(/ =.+/, '');
-				let id = line.replace(/[\s+]*.+= /, '').replace(';', '');
-				variables[variableName] = id;
+			if(line.match(/putBoolean|putUnitDouble|putDouble|putInteger|putString|putName|putPath/)) {
+				lineSplit = line.split(', ');
+				// Find value and property name
+				lineValue = lineSplit[lineSplit.length - 1].replace(/ \);/, '');
+				lineProperty = lineSplit[0].replace(/.+(stringIDToTypeID|charIDToTypeID)/, '').match(/\w+/)[0];
+				// Add to array which will become the params object
+				variables.push(`${lineProperty}: ${lineValue.replace(/"""/g,'"')}`);
+				// Replace found value with param value
+				parsedLine = line.replace(lineValue, `params.${lineProperty}`);
+				parsedLines.push(parsedLine);
 			} else {
-				let cleanLine = line;
-				if(cleanLine[0] === ' ') {
-					cleanLine = cleanLine.replace(/\s+/, '');
-				}
-				actionLines.push(cleanLine);
+				parsedLines.push(line);
 			}
 		});
-		console.log(lines);
 
-		//\( charIDToTypeID\(( ".+" \), .+ \))
+		// Create function string
+		let functionString = `
+function newFunction(params) {
+	${parsedLines.join('\n	')}
+}
 
-		let parsedLines = [];
-		// actionLines.forEach(actionLine => {
-		// 	let idNames = actionLine.match(/id\w+/g);
-		// 	let parsedLine = actionLine;
-		// 	if(idNames && idNames.length > 0) {
-		// 		idNames.forEach(function(idName) {
-		// 			parsedLine = parsedLine.replace(idName, variables[idName]);
-		// 		});
-		// 	}
-		// 	parsedLines.push(parsedLine);
-		// });
+var params = {
+	${variables.join(',\n	')}
+};
 
-		return parsedLines.join('\n');
+newFunction(params);`;
 
-		return data
+		return functionString;
 	}
 
 	/*
