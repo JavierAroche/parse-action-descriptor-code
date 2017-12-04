@@ -1,6 +1,6 @@
 body {
-	font-family: 'Quicksand', sans-serif;
-	width: 700px;
+	font-family: 'Quicksand', sans-serif !important;
+	width: 900px;
 	border-style: none;
 	margin-left: auto;
 	margin-right: auto;
@@ -24,15 +24,18 @@ h3 {
 }
 
 textarea {
-	width: 700px;
+	width: 100%;
 	height: 300px;
 	padding: 4px 7px;
+	font-size: 12px;
+	font-family: Inconsolata, Monaco, Consolas, 'Courier New', Courier;
 	border: none;
 	border-radius: 4px;
 	color: #FFFFFF;
 	margin: 0 0 15px 0;
 	background-color: #282C34;
-    outline: none;
+	outline: none;
+	resize: vertical;
 }
 
 #buttons {
@@ -68,4 +71,25 @@ textarea {
 	outline: none;
 	text-align: center;
 	margin: 0 5px 0 5px;
+}
+
+#outputTextArea {
+	opacity: 0;
+	height: 0;
+	width: 0;
+}
+
+#outputPre {
+	border-radius: 4px;
+	min-height: 300px;
+	background: #282C34 !important;
+}
+
+#output {
+	font-size: 12px;
+	font-family: Inconsolata, Monaco, Consolas, 'Courier New', Courier;
+}
+
+#copy {
+	margin: 10px auto 0 auto;
 }
