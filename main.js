@@ -160,7 +160,7 @@ class Parser {
 				}
 				lists[listNumber].push(lineValue);
 				// Replace found value with param value
-				parsedLine = line.replace(/ \d+ /, `params.${listNumber}[${lists[listNumber].length - 1}]`);
+				parsedLine = line.replace(/ \d+ /, ` params.${listNumber}[${lists[listNumber].length - 1}]`);
 				parsedLines.push(parsedLine);
 			} else if(line.match(/putBoolean|putUnitDouble|putDouble|putInteger|putIdentifier|putIndex|putString|putName|putPath/)) {
 				lineSplit = line.split(', ');
