@@ -1,7 +1,7 @@
 {
   "name": "parse-action-descriptor-code",
   "version": "1.0.0",
-  "description": "[![npm-image](https://img.shields.io/badge/parse--action--descriptor--code-v0.0.0-09bc00.svg)](https://github.com/JavierAroche/parse-action-descriptor-code)",
+  "description": "Parse your Photoshop Action Descriptor code from the Scripting Listener into a more readable format.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
