@@ -30,5 +30,9 @@ const constants = {
 	"Fl": "fill",
 	"Strk": "stroke",
 	"LyrI": "layerID",
-	"T": "to"
+	"DocI": "docID",
+	"T": "to",
+	"Nm": "name",
+	"Rslt": "resolution",
+	"Dpth": "depth"
 };
