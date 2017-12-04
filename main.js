@@ -12,7 +12,7 @@ const inputCount = document.getElementById('inputCount');
 const output = document.getElementById('output');
 const outputCount = document.getElementById('outputCount');
 const dropDown = document.getElementById('dropDown');
-const cleanDescCheck = document.getElementById('cleanDescCheck');
+const cleanVariables = document.getElementById('cleanVariables');
 
 input.focus();
 
@@ -24,7 +24,7 @@ parseBtn.addEventListener('click', () => {
 	let data = input.value;
 	let parsedData = data;
 
-	if(cleanDescCheck.checked) {
+	if(cleanVariables.checked) {
 		parsedData = parser.cleanDesc(parsedData);
 	}
 
@@ -36,8 +36,9 @@ parseBtn.addEventListener('click', () => {
 			parsedData = parser.sortIDs(parsedData);
 			break;
 		case 'createFunction':
+			let functionName = document.getElementById('functionName').value;
 			parsedData = parser.cleanJSX(parsedData);
-			parsedData = parser.createFunction(parsedData);
+			parsedData = parser.createFunction(parsedData, functionName);
 			break;
 	}
 
@@ -142,7 +143,7 @@ class Parser {
 	/*
 	 * Create a function based on the action descriptor code
 	 */
-	createFunction(data) {
+	createFunction(data, functionName) {
 		let lines = data.split('\n');
 		let variables = [];
 		let parsedLines = [];
@@ -164,8 +165,8 @@ class Parser {
 		});
 
 		// Create function string
-		let functionString = `
-function newFunction(params) {
+		let functionString =
+`function ${functionName}(params) {
 	${parsedLines.join('\n	')}
 }
 
@@ -173,7 +174,7 @@ var params = {
 	${variables.join(',\n	')}
 };
 
-newFunction(params);`;
+${functionName}(params);`;
 
 		return functionString;
 	}

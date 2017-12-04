@@ -13,14 +13,14 @@ h1 {
 	text-align: center;
 	font-size: 18px;
 	font-weight: lighter;
-	margin: 30px 0 15px 0;
+	margin: 30px 0 8px 0;
 }
 
 h3 {
 	text-align: center;
-	font-size: 12px;
+	font-size: 12px;;
 	font-weight: lighter;
-	margin: 10px 0 10px 0;
+	margin: 8px 0 10px 0;
 }
 
 textarea {
@@ -54,9 +54,21 @@ textarea {
 
 #dropDown {
 	margin: 0 5px 0 5px;
+	background-color: lightgrey;
+	outline: none;
 }
 
-#cleanDescText {
+#cleanVariables {
 	font-size: 12px;
 	font-weight: lighter;
+}
+
+#functionName {
+	width: 120px;
+	border: none;
+	border-radius: 2px;
+	outline: none;
+	text-align: center;
+	background-color: lightgrey;
+	margin: 0 5px 0 5px;
 }
