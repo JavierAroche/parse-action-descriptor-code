@@ -3,6 +3,9 @@
 <head>
 	<title>parse-action-descriptor-code</title>
 	<link rel="stylesheet" type="text/css" href="./css/styles.css" />
+	<link href="./css/prism-themes/prism-onedark.css" rel="stylesheet" />
+	<!-- <link href="./node_modules/prismjs/themes/prism-okaidia.css" rel="stylesheet" /> -->
+	<script src="./node_modules/prismjs/prism.js"></script>
 </head>
 
 <body>
@@ -31,7 +34,11 @@
 		<span>Line count: </span>
 		<span id="outputCount">0</span>
 	</h3>
-	<textarea id="output"></textarea>
+	<pre id="outputPre"><code id="output" class="language-js"></code></pre>
+	<div class="options">
+		<button id="copy">Copy to clipboard</button>
+	</div>
+	<textarea id="outputTextArea"></textarea>
 </body>
 <script type="text/javascript" src="./constants.js"></script>
 <script type="text/javascript" src="./main.js"></script>
