@@ -13,6 +13,7 @@ const output = document.getElementById('output');
 const outputCount = document.getElementById('outputCount');
 const dropDown = document.getElementById('dropDown');
 const cleanVariables = document.getElementById('cleanVariables');
+const cleanParams = document.getElementById('cleanParams');
 
 input.focus();
 
@@ -165,8 +166,11 @@ class Parser {
 			} else if(line.match(/putBoolean|putUnitDouble|putDouble|putInteger|putIdentifier|putIndex|putString|putName|putPath/)) {
 				lineSplit = line.split(', ');
 				// Get value and property name
-				lineValue = lineSplit[lineSplit.length - 1].replace(/ \);/, '');
+				lineValue = lineSplit[lineSplit.length - 1].replace(/\);/, '');
 				lineProperty = lineSplit[0].replace(/.+(stringIDToTypeID|charIDToTypeID)/, '').match(/\w+/)[0];
+				if(cleanParams.checked) {
+					lineProperty = this.replaceConstant(lineProperty);
+				}
 				// Add to array which will become the params object
 				variables.push(`${lineProperty}: ${lineValue.replace(/"""/g,'"')}`);
 				// Replace found value with param value
@@ -195,6 +199,17 @@ var params = {
 ${functionName}(params);`;
 
 		return functionString;
+	}
+
+	/*
+	 * Replace constant from list
+	 */
+	replaceConstant(variable) {
+		if(constants.hasOwnProperty(variable)) {
+			return constants[variable];
+		} else {
+			return variable.toLowerCase();
+		}
 	}
 
 	/*
