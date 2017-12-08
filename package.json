@@ -1,11 +1,9 @@
 {
   "name": "parse-action-descriptor-code",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Parse your Photoshop Action Descriptor code from the Scripting Listener into a more readable format.",
   "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JavierAroche/parse-action-descriptor-code.git"
@@ -16,7 +14,5 @@
     "url": "https://github.com/JavierAroche/parse-action-descriptor-code/issues"
   },
   "homepage": "https://github.com/JavierAroche/parse-action-descriptor-code#readme",
-  "dependencies": {
-    "prismjs": "^1.8.4"
-  }
+  "dependencies": {}
 }
