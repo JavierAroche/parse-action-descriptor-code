@@ -1,18 +1,20 @@
 # Parse Action Descriptor Code
-[![npm-image](https://img.shields.io/badge/parse--action--descriptor--code-v1.0.0-09bc00.svg)](https://github.com/JavierAroche/parse-action-descriptor-code)
+[![npm-image](https://img.shields.io/badge/parse--action--descriptor--code-v1.1.0-09bc00.svg)](https://github.com/JavierAroche/parse-action-descriptor-code)
 
 ## Description
 Parse your Photoshop Action Descriptor code from the Scripting Listener into a more readable format, or into a flexible function.
 
 ## Install
 * Git clone this repository
-* `npm install`
+* Open .`/index.html`
 
 ## Usage
-Copy and paste your output from the Scripting Listener into the Input text area. Select the desired function. Click "Parse", and your parsed code will be shown in the Output text area.
+Open [parse-action-descriptor-code](https://javieraroche.github.io/parse-action-descriptor-code/)
+
+Copy and paste your output from the Scripting Listener into the `Input` text area. Select the desired function. Click `Parse`, and your parsed code will be shown in the `Output` text area.
 
 ## Example
-Input from the Scripting Listener (Make new document)
+Input from the Scripting Listener (`Make new document`)
 ```javascript
 var idMk = charIDToTypeID( "Mk  " );
     var desc36 = new ActionDescriptor();
@@ -50,7 +52,8 @@ var idMk = charIDToTypeID( "Mk  " );
     desc36.putInteger( idDocI, 208 );
 executeAction( idMk, desc36, DialogModes.NO );
 ```
-Clean JSX | clean variables ✔︎ clean params ✔︎
+
+**Clean JSX | clean variables ✔︎ clean params ✔︎**
 ```javascript
 var desc1 = new ActionDescriptor();
 var desc2 = new ActionDescriptor();
@@ -68,7 +71,7 @@ desc1.putObject( charIDToTypeID( "Nw  " ), charIDToTypeID( "Dcmn" ), desc2 );
 desc1.putInteger( charIDToTypeID( "DocI" ), 208 );
 executeAction( charIDToTypeID( "Mk  " ), desc1, DialogModes.NO );
 ```
-Sort IDs | clean variables ✔︎ clean params ✔︎
+**Sort IDs | clean variables ✔︎ clean params ✔︎**
 ```javascript
 var idMk = charIDToTypeID( "Mk  " );
 var idNw = charIDToTypeID( "Nw  " );
@@ -105,7 +108,7 @@ desc1.putObject( idNw, idDcmn, desc2 );
 desc1.putInteger( idDocI, 208 );
 executeAction( idMk, desc1, DialogModes.NO );
 ```
-Create function | clean variables ✔︎ clean params ✔︎
+**Create function | clean variables ✔︎ clean params ✔︎**
 ```javascript
 function makeNewDocument(params) {
 	var desc1 = new ActionDescriptor();
@@ -141,6 +144,9 @@ makeNewDocument(params);
 ```
 
 ## Changelog
+**v1.1.0 (Dec 07 2017)**
+* Replaced prism node module with min version
+
 **v1.0.0 (Dec 03 2017)**
 * First release
 * Feature: "Clean JSX"

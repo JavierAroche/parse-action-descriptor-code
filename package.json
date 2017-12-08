@@ -1,6 +1,6 @@
 {
   "name": "parse-action-descriptor-code",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Parse your Photoshop Action Descriptor code from the Scripting Listener into a more readable format.",
   "main": "main.js",
   "scripts": {},
