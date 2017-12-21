@@ -65,6 +65,7 @@ input.addEventListener('input', () => {
  */
 clearBtn.addEventListener('click', () => {
 	input.value = '';
+	output.innerHTML = '';
 	parser.getLineCounts();
 });
 
