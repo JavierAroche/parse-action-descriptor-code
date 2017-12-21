@@ -100,7 +100,7 @@ class Parser {
 				variables[variableName] = id;
 			} else if(line !== '') {
 				let cleanLine;
-				if(line[0] === ' ' || line[0] === '    ') {
+				if(line[0] === ' ' || line[0] === '	') {
 					cleanLine = line.replace(/\s+/, '');
 				} else {
 					cleanLine = line;
