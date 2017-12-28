@@ -166,15 +166,22 @@ class Parser {
 		let lineSplit, lineValue, lineProperty, parsedLine, listNumber;
 		lines.forEach(line => {
 			if(line.match(/list|ref/) && line.match(/putIndex|putInteger|putIdentifier/)) {
-				// Get list/ref number and capitalize first letter
+				// Get list/ref number
+				// Example: "list1.putInteger( 3 );"
+				// Result: "list1"
 				listNumber = line.match(/\w+/)[0];
 				// Get value
+				// Example: "list1.putInteger( 3 );"
+				// Result: 3
 				lineValue = Number(line.match(/ \d+ /)[0]);
+				// Only create a new property if the list value hasn't been used before
 				if(!lists.hasOwnProperty(listNumber)) {
 					lists[listNumber] = [];
 				}
 				lists[listNumber].push(lineValue);
 				// Replace found value with param value
+				// Example: "list1.putInteger( 3 );"
+				// Result: "list1.putInteger( params.list1[0] );"
 				parsedLine = line.replace(/ \d+ /, ` params.${listNumber}[${lists[listNumber].length - 1}] `);
 				parsedLines.push(parsedLine);
 			} else if(line.match(/putBoolean|putUnitDouble|putEnumerated|putDouble|putInteger|putIdentifier|putIndex|putString|putName|putPath/)) {
@@ -220,7 +227,8 @@ class Parser {
 
 		// Add lists as variables
 		for(let key in lists) {
-			variables.push(`${key}: [${lists[key].join(',')}]`);
+			var keyValue = lists[key].join(', ');
+			variables.push(`${key}: [${keyValue}]`);
 		}
 
 		// Create function string
