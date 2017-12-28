@@ -92,6 +92,7 @@ textarea {
 	border-radius: 8px;
 	margin: 5px 2px 0 2px;
 	background-color: #DCDCDC;
+	outline: none;
 }
 
 #parse:hover, #clear:hover, #copy:hover {
