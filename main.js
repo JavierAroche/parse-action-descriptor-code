@@ -184,6 +184,10 @@ class Parser {
 				// Result: "list1.putInteger( params.list1[0] );"
 				parsedLine = line.replace(/ \d+ /, ` params.${listNumber}[${lists[listNumber].length - 1}] `);
 				parsedLines.push(parsedLine);
+			} else if(line.match(/Ordn|Trgt/)) {
+				// Avoid passing target document or layer as a param. These are exceptions
+				// Example: "desc1.putEnumerated( charIDToTypeID( "Lyr " ), charIDToTypeID( "Ordn" ), charIDToTypeID( "Trgt" ) );"
+				parsedLines.push(line);
 			} else if(line.match(/putBoolean|putUnitDouble|putEnumerated|putDouble|putInteger|putIdentifier|putIndex|putString|putName|putPath/)) {
 				// Almost every line will contain the param after the last comma
 				// Example: "desc2.putBoolean( stringIDToTypeID( "artboard" ), false );"
