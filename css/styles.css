@@ -124,7 +124,7 @@ textarea {
 	color: #DCDCDC;
 }
 
-#cleanVariablesText, #cleanParamsText {
+#cleanVariablesText, #cleanParamsText, #enumeratedParamsText {
 	font-size: 12px;
 	font-weight: lighter;
 }
