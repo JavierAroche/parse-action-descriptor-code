@@ -190,18 +190,28 @@ class Parser {
 				// Example: "desc1.putEnumerated( charIDToTypeID( "Lyr " ), charIDToTypeID( "Ordn" ), charIDToTypeID( "Trgt" ) );"
 				parsedLines.push(line);
 			} else if(line.match(/putBoolean|putUnitDouble|putEnumerated|putDouble|putInteger|putIdentifier|putIndex|putString|putName|putPath/)) {
+				let isString;
 				if(line.match(/putEnumerated/) && !enumeratedParams.checked) {
-					console.log(line);
 					parsedLines.push(line);
 				} else {
 					// Almost every line will contain the param after the last comma
 					// Example: "desc2.putBoolean( stringIDToTypeID( "artboard" ), false );"
 					// Result: " false );"
 					lineSplit = line.split(', ');
-					// Get the value or the stringID or CharID to be used as param
-					// Example: "desc2.putBoolean( stringIDToTypeID( "artboard" ), false );"
-					// Result: false
-					lineValue = lineSplit[lineSplit.length - 1].replace(/\);/, '');
+
+					if (line.match(/putString/)) {
+						// To avoid issues with complicated strings, use a separate regex
+						// Example: desc4.putString( charIDToTypeID( "Nm  " ), """$$$/DefaultGradient/RedGreen=Red, Green""" );
+						// Result: """$$$/DefaultGradient/RedGreen=Red, Green"""
+						lineValue = line.match(/""".+"""/)[0];
+						isString = true;
+					} else {
+						// Get the value or the stringID or CharID to be used as param
+						// Example: "desc2.putBoolean( stringIDToTypeID( "artboard" ), false );"
+						// Result: false
+						lineValue = lineSplit[lineSplit.length - 1].replace(/\);/, '');
+						isString = false;
+					}
 					// Catch any UnitDouble or Enumerated that use a stringID or charID as the param
 					// Example: "desc2.putEnumerated( charIDToTypeID( "Fl  " ), charIDToTypeID( "Fl  " ), charIDToTypeID( "Trns" ) );"
 					// Result: "Trns"
@@ -212,10 +222,12 @@ class Parser {
 					// Example: """sRGB IEC61966-2.1"""
 					// Result: "sRGB IEC61966-2.1"
 					lineValue = lineValue.replace(/"+/g,'"');
+
 					// Get the stringID or charID by parsing the string
 					// Example: "desc2.putBoolean( stringIDToTypeID( "artboard" ), false );"
 					// Result: "artboard"
 					lineProperty = lineSplit[0].replace(/.+(stringIDToTypeID|charIDToTypeID)/, '').match(/\w+/)[0];
+
 					// Use the constant list to make properties more readible, per user request
 					// Example: Rslt
 					// Result: resolution
@@ -224,10 +236,16 @@ class Parser {
 					}
 					// Add to array. This will become the params object
 					variables.push(`${lineProperty}: ${lineValue}`);
+
 					// Replace found value with param value
 					// Example: "desc2.putBoolean( stringIDToTypeID( "artboard" ), false );"
 					// Result: "desc2.putBoolean( stringIDToTypeID( "artboard" ), params.artboard );"
-					parsedLine = line.replace(lineValue, `params.${lineProperty}`);
+					if(isString) {
+						parsedLine = line.replace(`""${lineValue}""`, `params.${lineProperty}`);
+					} else {
+						parsedLine = line.replace(lineValue, `params.${lineProperty}`);
+					}
+
 					parsedLines.push(parsedLine);
 				}
 			} else {
