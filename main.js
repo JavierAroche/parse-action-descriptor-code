@@ -281,7 +281,7 @@ ${functionName}(params);`;
 		if(constants.hasOwnProperty(variable)) {
 			return constants[variable];
 		} else {
-			return variable.charAt(0).toLowerCase() + variable.slice(1);
+			return variable.toLowerCase();
 		}
 	}
 
